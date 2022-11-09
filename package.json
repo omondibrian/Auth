@@ -11,7 +11,7 @@
     "build": "npm-run-all clean tsc ",
     "dev:start": "nodemon dist/app.js",
     "dev": "ts-node index.ts",
-    "start": "node dist/src/app.js",
+    "start": "node dist/app.js",
     "test": "jest ",
     "test:all": "npm test __tests__/**/*.spec.ts",
     "generate": "prisma generate",
