@@ -1,0 +1,20 @@
+syntax = "proto3";
+package Notification;
+
+message emailReturnPayload {
+    string id = 1;
+    string message = 2;
+}
+
+message Imail{
+    string to = 1;
+    string from = 2;
+    string subject = 3;
+    string message = 4;
+    string text = 5 ;
+}
+
+service Email{
+    rpc sendMail(Imail) returns (emailReturnPayload){};
+}
+
