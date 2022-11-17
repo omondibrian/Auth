@@ -24,7 +24,7 @@ const editProfile = serviceProvider.editProfile;
 /**
  * @openapi
  * components :
- *   securitySchemes: 
+ *   securitySchemes:
  *     BearerAuth:
  *       type: http
  *       scheme: bearer
@@ -121,17 +121,15 @@ const editProfile = serviceProvider.editProfile;
  */
 userRoutes.post("/register", async (req: any, res) => {
   let uploadPath;
-
-  if (!req.files || Object.keys(req.files).length === 0) {
-    res.status(400).send("No files were uploaded.");
-    return;
-  }
-  console.log(req.body);
+  
   const { name, email, password } = req.body;
-  const profilePic: any = req.files?.profilePic;
-
+  let profilePic: any =  { name : "/default.jpg"};
   uploadPath = path.relative(".", "uploads");
-  profilePic.mv(uploadPath + "/" + Date.now() + profilePic.name);
+  
+  if ( req.files && Object.keys(req.files).length > 0) {
+    profilePic = req.files.profilePic ;
+    profilePic.mv(uploadPath + "/" + Date.now() + profilePic.name);
+  }
 
   const newUser = new UserDto(
     name,
@@ -139,6 +137,8 @@ userRoutes.post("/register", async (req: any, res) => {
     uploadPath + "/" + Date.now() + profilePic.name,
     password
   );
+
+  console.log(newUser);
   const result = await registerUsecase.registeruser(newUser);
   res.status(result!.status).json({
     user: result!.getResult().payload,
@@ -199,7 +199,7 @@ userRoutes.post("/login", async (req, res) => {
  * /api/v1/auth/edit:
  *   put:
  *     description: edit user profile
- *     security: 
+ *     security:
  *       - BearerAuth : []
  *     consumes:
  *      - application/json
@@ -224,17 +224,21 @@ userRoutes.post("/login", async (req, res) => {
  *      500:
  *       description: profile update unsucessfull please retry
  */
-userRoutes.put("/edit", TokenMiddleware,ProfileValidation, async (req: any, res) => {
-
-  const result = await editProfile.update(req.UserId, {
-    ...req.body,
-    ...req.files,
-  });
-  res.status(result!.status).json({
-    user: result!.getResult().payload,
-    message: result!.getResult().message,
-  });
-});
+userRoutes.put(
+  "/edit",
+  TokenMiddleware,
+  ProfileValidation,
+  async (req: any, res) => {
+    const result = await editProfile.update(req.UserId, {
+      ...req.body,
+      ...req.files,
+    });
+    res.status(result!.status).json({
+      user: result!.getResult().payload,
+      message: result!.getResult().message,
+    });
+  }
+);
 
 /**
  * @openapi
@@ -281,7 +285,7 @@ userRoutes.post("/password-reset", async (req, res) => {
  * /api/v1/auth/profile:
  *   get:
  *     description: fetch user profile data
- *     security: 
+ *     security:
  *       - BearerAuth : []
  *     responses:
  *      200:
@@ -315,7 +319,7 @@ userRoutes.get("/profile", TokenMiddleware, async (req: any, res) => {
  *      500:
  *       description: error verifying token
  */
- userRoutes.get("/otp/:token", async (req: any, res) => {
+userRoutes.get("/otp/:token", async (req: any, res) => {
   const result = await serviceProvider.verifyToken.verify(req.params.token);
   res.status(result!.status).json({
     payload: result!.getResult().payload!,
