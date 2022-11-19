@@ -48,6 +48,7 @@ export class Registration {
         email: newUser.email,
         password: encrptedPass,
         profilePic: newUser.profilePic,
+        role: newUser.role,
       });
       if (!savedUser) { throw new Error("cannot send mail to user of undefined"); }
 
@@ -62,7 +63,6 @@ export class Registration {
           <small>this is an automated email</small>
           `;
       // send the email
-      console.log(savedUser);
       await this.mailer.send({
         to: savedUser.email,
         from: process.env.SMTP_USER as string,

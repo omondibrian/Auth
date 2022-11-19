@@ -17,7 +17,6 @@
    next: NextFunction
  ) => {
    const token = req.header("Authorization").split(" ").pop();
-   console.log(token)
    if (!token) return res.status(401).send("ACCESS DENIED");
  
    try {
@@ -49,5 +48,27 @@
     next()
   } else {
     res.status(403).send("Invalid user request");
+  }
+}
+
+
+export function registrationValidation(req: any,
+  res: Response,
+  next: NextFunction){
+
+  const schema = Joi.object({
+    name: Joi.string(),
+    email: Joi.string(),
+    role: Joi.string().valid("ADMIN","CUSTOMER","SELLER"),      
+    password: Joi.string(),
+  });
+
+  const result = schema.validate(req.body);
+  if(result.error === undefined){
+    next()
+  } else {
+    res.status(403).send({
+      msg: result.error.details[0].message
+    });
   }
 }

@@ -47,9 +47,9 @@ export class LogIn {
           this.config().env !== "production"
             ? error.message
             : "unable to login at the moment please try again";
-        throw new Error(msg);
-      }
-      if (!user) { throw new Error("Error authenticating please try again !"); }
+            throw new Error(msg);
+          }
+          if (!user) { throw new Error("Error authenticating please try again !"); }
       // check if password is correct
       const validPass = await this.bcrypt.compare(
         credentials.password,

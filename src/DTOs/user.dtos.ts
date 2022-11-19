@@ -12,13 +12,16 @@ export class UserDto {
   public profilePic: string;
   public password?: string;
   public id?: string;
-  public token?:string;
+  public token?: string;
+  public role: UserRole;
   constructor(
     name: string,
     email: string,
     profilePic: string,
+    role: string,
     Password?: string,
-    id?: string,token?:string,
+    id?: string,
+    token?: string
   ) {
     this.name = name;
     this.email = email;
@@ -26,5 +29,17 @@ export class UserDto {
     this.password = Password;
     this.id = id;
     this.token = token;
+    this.role =
+      role === "ADMIN"
+        ? UserRole.ADMIN
+        : role === "CUSTOMER"
+        ? UserRole.CUSTOMER
+        : UserRole.SELLER;
   }
+}
+
+enum UserRole {
+  ADMIN = "ADMIN",
+  CUSTOMER = "CUSTOMER",
+  SELLER = "SELLER",
 }

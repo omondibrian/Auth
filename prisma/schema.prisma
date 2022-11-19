@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  CUSTOMER
+  SELLER
+}
 
 model User {
   id              String           @id @default(auto()) @map("_id") @db.ObjectId
@@ -18,5 +23,6 @@ model User {
   password        String?
   token           String?
   profilePic      String
+  role            UserRole         @default(CUSTOMER)
   createdAt       DateTime         @default(now())
 }

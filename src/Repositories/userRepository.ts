@@ -6,6 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { UserRole } from "@prisma/client";
 import { UserDto } from "../DTOs/user.dtos";
 import { Repository } from "./IRepository";
 
@@ -29,6 +30,7 @@ export class UserRepository extends Repository implements IUserRepository {
         name: data.name,
         token: data?.token,
         profilePic: data.profilePic,
+        role: data.role,
         password: data.password,
       },
       select: this._userProjections,
@@ -49,11 +51,14 @@ export class UserRepository extends Repository implements IUserRepository {
         name: data.name,
         token: data?.token,
         profilePic: data.profilePic,
+        role: data.role.valueOf() === "ADMIN"? UserRole.ADMIN
+        : data.role.valueOf() === "CUSTOMER"
+        ? UserRole.CUSTOMER
+        : UserRole.SELLER,
         password: data.password,
       },
       select: this._userProjections,
     });
-    console.log(results)
     return this.returnUserPayload(results);
   };
   find = async (data: {

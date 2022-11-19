@@ -5,12 +5,13 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { Router } from 'express';
+import path from 'path';
 
-import { Router } from "express";
-import path from "path";
-import { UserDto } from "../DTOs/user.dtos";
-import { ProfileValidation, TokenMiddleware } from "../lib/middlewares";
-import { UserServiceProvider } from "../services/user";
+import { UserDto } from '../DTOs/user.dtos';
+import { ProfileValidation, registrationValidation, TokenMiddleware } from '../lib/middlewares';
+import { UserServiceProvider } from '../services/user';
+
 
 const userRoutes = Router();
 
@@ -45,6 +46,11 @@ const editProfile = serviceProvider.editProfile;
  *       type: string
  *       description:  user's profile picture url
  *       example: '/uploads/example.jpg'
+ *      role: 
+ *        description: defines the user's specified roles
+ *        enum:
+ *          - ADMIN
+ *          - CUSTOMER 
  *      password:
  *       type: string
  *       description:  user's password
@@ -65,6 +71,11 @@ const editProfile = serviceProvider.editProfile;
  *       type: file
  *       description:  user's profile picture url
  *       example: '/uploads/example.jpg'
+ *      role: 
+ *        description: defines the user's specified roles
+ *        enum:
+ *          - ADMIN
+ *          - CUSTOMER 
  *      password:
  *       type: string
  *       description:  user's password
@@ -116,29 +127,33 @@ const editProfile = serviceProvider.editProfile;
  *     responses:
  *      200:
  *       description: registration sucessfull please check your email
+ *      403:
+ *       description: Error- invalid request payload
  *      500:
  *       description: registration unsucessfull please retry
  */
-userRoutes.post("/register", async (req: any, res) => {
+userRoutes.post("/register", registrationValidation, async (req: any, res) => {
   let uploadPath;
-  
-  const { name, email, password } = req.body;
-  let profilePic: any =  { name : "/default.jpg"};
+
+  const { name, email, password ,role} = req.body;
+  let profilePic: any = { name: "http://www.gravatar.com/avatar/?d=identicon" };
   uploadPath = path.relative(".", "uploads");
-  
-  if ( req.files && Object.keys(req.files).length > 0) {
-    profilePic = req.files.profilePic ;
+
+  if (req.files && Object.keys(req.files).length > 0) {
+    profilePic = req.files.profilePic;
     profilePic.mv(uploadPath + "/" + Date.now() + profilePic.name);
   }
 
   const newUser = new UserDto(
     name,
     email,
-    uploadPath + "/" + Date.now() + profilePic.name,
+    req.files
+      ? uploadPath + "/" + Date.now() + profilePic.name
+      : profilePic.name,
+    role,
     password
   );
 
-  console.log(newUser);
   const result = await registerUsecase.registeruser(newUser);
   res.status(result!.status).json({
     user: result!.getResult().payload,
@@ -233,8 +248,14 @@ userRoutes.put(
       ...req.body,
       ...req.files,
     });
+    const data = result!.getResult().payload as UserDto;
     res.status(result!.status).json({
-      user: result!.getResult().payload,
+      user: {
+        name: data.name,
+        email: data.email,
+        profilePic: data.profilePic,
+        role: data.role,
+      },
       message: result!.getResult().message,
     });
   }
@@ -295,8 +316,14 @@ userRoutes.post("/password-reset", async (req, res) => {
  */
 userRoutes.get("/profile", TokenMiddleware, async (req: any, res) => {
   const result = await fetchProfile.profile(req.UserId);
+  const data = result!.getResult().payload as UserDto;
   res.status(result!.status).json({
-    user: result!.getResult().payload,
+    user: {
+      name: data.name,
+      email: data.email,
+      profilePic: data.profilePic,
+      role: data.role,
+    },
     message: result!.getResult().message,
   });
 });

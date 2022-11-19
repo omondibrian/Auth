@@ -46,6 +46,7 @@ export class EditProfile {
         updates.name,
         updates.email,
         updates.profilePic,
+        updates.role,
         updates.id
       );
       return new ResultPayload<UserDto>(result, 200);

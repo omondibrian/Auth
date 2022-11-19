@@ -25,6 +25,7 @@ export class ViewProfile {
         profile.name,
         profile.email,
         profile.profilePic,
+        profile.role,
         profile.id
       );
 

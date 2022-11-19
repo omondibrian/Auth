@@ -40,6 +40,7 @@ export class PasswordReset {
         user.name,
         user.email,
         user.profilePic,
+        user.role,
         user.password,
         user.id,
         otp

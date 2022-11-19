@@ -43,6 +43,7 @@ export default class AuthServiceUtilities implements IAuthserviceUtilities {
       profilePic: Joi.any(),
       id: Joi.any(),
       token: Joi.any(),
+      role: Joi.string(),
       email: Joi.string()
         .email({
           minDomainSegments: 2,

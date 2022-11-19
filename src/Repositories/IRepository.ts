@@ -14,6 +14,7 @@ export abstract class Repository {
   protected returnUserPayload(results: {
     name: string;
     email: string;
+    role: string;
     password: string | null;
     token: string | null;
     id: string;
@@ -23,6 +24,7 @@ export abstract class Repository {
       results.name,
       results.email,
       results.profilePic,
+      results.role,
       results.password!,
       results.id,
       results.token!
@@ -36,5 +38,6 @@ export abstract class Repository {
     password: true,
     profilePic: true,
     token: true,
+    role:true,
   };
 }
